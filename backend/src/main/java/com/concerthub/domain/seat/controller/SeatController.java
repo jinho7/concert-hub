@@ -5,6 +5,8 @@ import com.concerthub.domain.seat.dto.response.SeatResponse;
 import com.concerthub.domain.seat.dto.response.SeatSummaryResponse;
 import com.concerthub.domain.seat.entity.Seat;
 import com.concerthub.domain.seat.service.SeatService;
+import com.concerthub.global.exception.BusinessException;
+import com.concerthub.global.exception.ErrorCode;
 import com.concerthub.global.response.ApiResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -78,6 +80,18 @@ public class SeatController {
 
         SeatSummaryResponse summary = SeatSummaryResponse.of(eventId, seatCounts, minPrice, maxPrice);
         return ApiResponse.success(summary);
+    }
+
+    @GetMapping("/{seatId}")
+    public ApiResponse<SeatResponse> getSeat(@PathVariable Long eventId, @PathVariable Long seatId) {
+        Seat seat = seatService.getSeat(seatId);
+
+        // 이벤트 ID 검증 (해당 이벤트의 좌석인지 확인)
+        if (!seat.getEvent().getId().equals(eventId)) {
+            throw new BusinessException(ErrorCode.INVALID_INPUT_VALUE, "해당 이벤트의 좌석이 아닙니다.");
+        }
+
+        return ApiResponse.success(SeatResponse.from(seat));
     }
 
     @PostMapping("/{seatId}/temporary-reserve")
