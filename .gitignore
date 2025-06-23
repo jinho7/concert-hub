@@ -1,0 +1,44 @@
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Backend (Java/Spring)
+backend/target/
+backend/build/
+backend/.gradle/
+backend/out/
+backend/*.jar
+backend/*.war
+backend/.env
+backend/application-local.yml
+
+# Frontend (Node.js)
+frontend/node_modules/
+frontend/build/
+frontend/dist/
+frontend/.env
+frontend/.env.local
+
+# Infrastructure
+infrastructure/terraform/.terraform/
+infrastructure/terraform/*.tfstate
+infrastructure/terraform/*.tfstate.backup
+infrastructure/terraform/.terraform.lock.hcl
+infrastructure/terraform/terraform.tfvars
+
+# Kubernetes
+k8s/overlays/*/secrets/
+
+# Logs
+*.log
+logs/
+
+# Temporary files
+tmp/
+temp/
