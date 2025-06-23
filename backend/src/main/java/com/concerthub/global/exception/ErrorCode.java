@@ -20,9 +20,13 @@ public enum ErrorCode {
     EVENT_NOT_AVAILABLE(HttpStatus.BAD_REQUEST, "E003", "예약할 수 없는 이벤트입니다."),
     INVALID_SEAT_COUNT(HttpStatus.BAD_REQUEST, "E004", "좌석 수가 올바르지 않습니다."),
 
-    // 좌석 관련 에러 (추후 사용)
+    // 좌석 관련 에러
     SEAT_NOT_FOUND(HttpStatus.NOT_FOUND, "S001", "존재하지 않는 좌석입니다."),
     SEAT_ALREADY_RESERVED(HttpStatus.BAD_REQUEST, "S002", "이미 예약된 좌석입니다."),
+    SEAT_NOT_AVAILABLE(HttpStatus.BAD_REQUEST, "S003", "예약할 수 없는 좌석입니다."),
+    SEAT_TEMPORARILY_RESERVED(HttpStatus.BAD_REQUEST, "S004", "임시 예약된 좌석입니다."),
+    SEAT_RESERVATION_EXPIRED(HttpStatus.BAD_REQUEST, "S005", "좌석 예약 시간이 만료되었습니다."),
+    INVALID_SEAT_OPERATION(HttpStatus.BAD_REQUEST, "S006", "잘못된 좌석 작업입니다."),
 
     // 예약 관련 에러 (추후 사용)
     RESERVATION_NOT_FOUND(HttpStatus.NOT_FOUND, "R001", "존재하지 않는 예약입니다."),
