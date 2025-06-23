@@ -4,7 +4,9 @@ import com.concerthub.domain.auth.dto.request.LoginRequest;
 import com.concerthub.domain.auth.service.AuthService;
 import com.concerthub.global.jwt.dto.JwtDto;
 import com.concerthub.global.jwt.userdetails.CustomUserDetails;
+import com.concerthub.global.jwt.util.JwtUtil;
 import com.concerthub.global.response.ApiResponse;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -19,6 +21,7 @@ import org.springframework.web.bind.annotation.*;
 public class AuthController {
 
     private final AuthService authService;
+    private final JwtUtil jwtUtil;
 
     @PostMapping("/login")
     public ResponseEntity<ApiResponse<JwtDto>> login(@Valid @RequestBody LoginRequest loginRequest) {
@@ -27,8 +30,12 @@ public class AuthController {
     }
 
     @PostMapping("/logout")
-    public ResponseEntity<ApiResponse<Void>> logout(@AuthenticationPrincipal CustomUserDetails userDetails) {
-        authService.logout(userDetails.getId());
+    public ResponseEntity<ApiResponse<Void>> logout(
+            @AuthenticationPrincipal CustomUserDetails userDetails,
+            HttpServletRequest request) {
+        
+        String accessToken = jwtUtil.resolveAccessToken(request);
+        authService.logout(userDetails.getId(), accessToken);
         return ResponseEntity.ok(ApiResponse.onSuccess(null));
     }
 

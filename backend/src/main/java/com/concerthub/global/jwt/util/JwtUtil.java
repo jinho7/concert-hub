@@ -1,11 +1,14 @@
 package com.concerthub.global.jwt.util;
 
+import com.concerthub.domain.auth.entity.BlacklistedToken;
 import com.concerthub.domain.auth.entity.RefreshToken;
+import com.concerthub.domain.auth.repository.BlacklistedTokenRepository;
 import com.concerthub.domain.auth.repository.RefreshTokenRepository;
 import com.concerthub.domain.user.entity.User;
 import com.concerthub.global.jwt.dto.JwtDto;
 import com.concerthub.global.jwt.exception.JwtErrorCode;
 import com.concerthub.global.jwt.exception.JwtException;
+import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.MalformedJwtException;
@@ -33,17 +36,20 @@ public class JwtUtil {
     private final Long accessTokenExpiration;
     private final Long refreshTokenExpiration;
     private final RefreshTokenRepository refreshTokenRepository;
+    private final BlacklistedTokenRepository blacklistedTokenRepository;
 
     public JwtUtil(
             @Value("${jwt.secret}") String secret,
             @Value("${jwt.access-token-expiration}") Long accessExpiration,
             @Value("${jwt.refresh-token-expiration}") Long refreshExpiration,
-            RefreshTokenRepository refreshTokenRepository) {
+            RefreshTokenRepository refreshTokenRepository,
+            BlacklistedTokenRepository blacklistedTokenRepository) {
         this.secretKey = new SecretKeySpec(secret.getBytes(StandardCharsets.UTF_8),
                 Jwts.SIG.HS256.key().build().getAlgorithm());
         this.accessTokenExpiration = accessExpiration;
         this.refreshTokenExpiration = refreshExpiration;
         this.refreshTokenRepository = refreshTokenRepository;
+        this.blacklistedTokenRepository = blacklistedTokenRepository;
     }
 
     public Long getUserId(String token) {
@@ -170,6 +176,12 @@ public class JwtUtil {
 
     public void validateToken(String token) {
         try {
+            // 1. 블랙리스트 체크
+            if (blacklistedTokenRepository.existsByToken(token)) {
+                throw new JwtException(JwtErrorCode.TOKEN_EXPIRED);
+            }
+
+            // 2. JWT 유효성 검증
             Jwts.parser()
                     .verifyWith(secretKey)
                     .build()
@@ -182,8 +194,29 @@ public class JwtUtil {
     }
 
     @Transactional
+    public void addToBlacklist(String token) {
+        // 토큰에서 만료 시간 추출
+        Claims claims = Jwts.parser()
+                .verifyWith(secretKey)
+                .build()
+                .parseSignedClaims(token)
+                .getPayload();
+        
+        Date expiration = claims.getExpiration();
+        LocalDateTime expiresAt = expiration.toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime();
+        
+        BlacklistedToken blacklistedToken = BlacklistedToken.builder()
+                .token(token)
+                .expiresAt(expiresAt)
+                .build();
+        
+        blacklistedTokenRepository.save(blacklistedToken);
+    }
+
+    @Transactional
     public void cleanupExpiredTokens() {
         refreshTokenRepository.deleteExpiredTokens(LocalDateTime.now());
-        log.info("만료된 리프레시 토큰 정리 완료");
+        blacklistedTokenRepository.deleteExpiredTokens(LocalDateTime.now());
+        log.info("만료된 리프레시 토큰 및 블랙리스트 토큰 정리 완료");
     }
 }

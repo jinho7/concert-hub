@@ -44,11 +44,16 @@ public class AuthService {
     }
 
     @Transactional
-    public void logout(Long userId) {
+    public void logout(Long userId, String accessToken) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new JwtException(JwtErrorCode.USER_NOT_FOUND));
 
-        // 리프레시 토큰 삭제
+        // 1. Access Token을 블랙리스트에 추가
+        if (accessToken != null) {
+            jwtUtil.addToBlacklist(accessToken);
+        }
+
+        // 2. Refresh Token 삭제
         jwtUtil.deleteRefreshToken(user);
 
         log.info("로그아웃 완료: 사용자ID={}", userId);

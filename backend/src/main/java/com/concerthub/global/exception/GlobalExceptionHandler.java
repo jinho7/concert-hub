@@ -4,6 +4,7 @@ import com.concerthub.global.jwt.exception.JwtException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authorization.AuthorizationDeniedException;
 import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -13,6 +14,16 @@ import org.springframework.web.method.annotation.MethodArgumentTypeMismatchExcep
 @Slf4j
 @RestControllerAdvice
 public class GlobalExceptionHandler {
+
+    /**
+     * Spring Security 권한 거부 예외 처리
+     */
+    @ExceptionHandler(AuthorizationDeniedException.class)
+    protected ResponseEntity<ErrorResponse> handleAuthorizationDeniedException(AuthorizationDeniedException e) {
+        log.warn("AuthorizationDeniedException: {}", e.getMessage());
+        final ErrorResponse response = ErrorResponse.of("AUTH_001", "접근 권한이 없습니다.");
+        return new ResponseEntity<>(response, HttpStatus.FORBIDDEN);
+    }
 
     /**
      * JWT 관련 예외 처리
