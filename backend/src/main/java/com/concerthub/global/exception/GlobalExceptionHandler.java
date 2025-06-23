@@ -1,5 +1,6 @@
 package com.concerthub.global.exception;
 
+import com.concerthub.global.jwt.exception.JwtException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -12,6 +13,17 @@ import org.springframework.web.method.annotation.MethodArgumentTypeMismatchExcep
 @Slf4j
 @RestControllerAdvice
 public class GlobalExceptionHandler {
+
+    /**
+     * JWT 관련 예외 처리
+     */
+    @ExceptionHandler(JwtException.class)
+    protected ResponseEntity<ErrorResponse> handleJwtException(JwtException e) {
+        log.warn("JwtException: {}", e.getMessage());
+        final ErrorResponse response = ErrorResponse.of(e.getErrorCode(), e.getMessage());
+        // JWT 예외는 일반적으로 401 상태로 처리
+        return new ResponseEntity<>(response, HttpStatus.UNAUTHORIZED);
+    }
 
     /**
      * 비즈니스 로직 예외 처리

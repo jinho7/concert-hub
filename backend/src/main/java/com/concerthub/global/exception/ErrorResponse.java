@@ -39,6 +39,16 @@ public class ErrorResponse {
                 .build();
     }
 
+    public static ErrorResponse of(String code, String message) {
+        return ErrorResponse.builder()
+                .message(message)
+                .code(code)
+                .status(401) // JWT 예외는 기본적으로 401
+                .timestamp(LocalDateTime.now())
+                .errors(new ArrayList<>())
+                .build();
+    }
+
     public static ErrorResponse of(ErrorCode errorCode, BindingResult bindingResult) {
         return ErrorResponse.builder()
                 .message(errorCode.getMessage())
