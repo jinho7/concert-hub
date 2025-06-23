@@ -6,6 +6,8 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
+import jakarta.persistence.LockModeType;
+import org.springframework.data.jpa.repository.Lock;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -37,4 +39,16 @@ public interface SeatRepository extends JpaRepository<Seat, Long> {
 
     // 특정 행의 좌석들 조회
     List<Seat> findByEventIdAndSeatRowOrderBySeatNumberAsc(Long eventId, String seatRow);
+
+    // 비관적 락으로 좌석 조회 (동시성 제어용)
+    @Lock(LockModeType.PESSIMISTIC_WRITE)
+    @Query("SELECT s FROM Seat s WHERE s.id = :id")
+    Optional<Seat> findByIdWithLock(@Param("id") Long id);
+
+    // 이벤트와 좌석 정보로 비관적 락 조회
+    @Lock(LockModeType.PESSIMISTIC_WRITE)
+    @Query("SELECT s FROM Seat s WHERE s.event.id = :eventId AND s.seatRow = :seatRow AND s.seatNumber = :seatNumber")
+    Optional<Seat> findByEventIdAndSeatRowAndSeatNumberWithLock(@Param("eventId") Long eventId,
+                                                                @Param("seatRow") String seatRow,
+                                                                @Param("seatNumber") String seatNumber);
 }

@@ -28,9 +28,20 @@ public enum ErrorCode {
     SEAT_RESERVATION_EXPIRED(HttpStatus.BAD_REQUEST, "S005", "좌석 예약 시간이 만료되었습니다."),
     INVALID_SEAT_OPERATION(HttpStatus.BAD_REQUEST, "S006", "잘못된 좌석 작업입니다."),
 
-    // 예약 관련 에러 (추후 사용)
+    // 예약 관련 에러
     RESERVATION_NOT_FOUND(HttpStatus.NOT_FOUND, "R001", "존재하지 않는 예약입니다."),
-    RESERVATION_EXPIRED(HttpStatus.BAD_REQUEST, "R002", "만료된 예약입니다.");
+    RESERVATION_EXPIRED(HttpStatus.BAD_REQUEST, "R002", "만료된 예약입니다."),
+    RESERVATION_ALREADY_CONFIRMED(HttpStatus.BAD_REQUEST, "R003", "이미 확정된 예약입니다."),
+    RESERVATION_ALREADY_CANCELLED(HttpStatus.BAD_REQUEST, "R004", "이미 취소된 예약입니다."),
+    RESERVATION_NOT_PENDING(HttpStatus.BAD_REQUEST, "R005", "대기 중인 예약이 아닙니다."),
+
+    // 사용자 관련 에러
+    USER_NOT_FOUND(HttpStatus.NOT_FOUND, "U001", "존재하지 않는 사용자입니다."),
+    USER_EMAIL_DUPLICATE(HttpStatus.BAD_REQUEST, "U002", "이미 존재하는 이메일입니다."),
+
+    // 결제 관련 에러
+    PAYMENT_FAILED(HttpStatus.BAD_REQUEST, "P001", "결제 처리에 실패했습니다."),
+    PAYMENT_NOT_FOUND(HttpStatus.NOT_FOUND, "P002", "존재하지 않는 결제입니다.");
 
     private final HttpStatus httpStatus;
     private final String code;
