@@ -17,16 +17,30 @@ public class UserController {
 
     private final UserService userService;
 
-    @PostMapping
+    @PostMapping("/register")
     @ResponseStatus(HttpStatus.CREATED)
     public ApiResponse<UserResponse> createUser(@Valid @RequestBody UserCreateRequest request) {
         User user = userService.createUser(
                 request.getName(),
                 request.getEmail(),
-                request.getPhoneNumber()
+                request.getPhoneNumber(),
+                request.getPassword()
         );
 
         return ApiResponse.success(UserResponse.from(user), "사용자가 성공적으로 생성되었습니다.");
+    }
+
+    @PostMapping("/admin")
+    @ResponseStatus(HttpStatus.CREATED)
+    public ApiResponse<UserResponse> createAdmin(@Valid @RequestBody UserCreateRequest request) {
+        User user = userService.createAdmin(
+                request.getName(),
+                request.getEmail(),
+                request.getPhoneNumber(),
+                request.getPassword()
+        );
+
+        return ApiResponse.success(UserResponse.from(user), "관리자가 성공적으로 생성되었습니다.");
     }
 
     @GetMapping("/{id}")

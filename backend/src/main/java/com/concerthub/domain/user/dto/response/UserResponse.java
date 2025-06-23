@@ -1,6 +1,7 @@
 package com.concerthub.domain.user.dto.response;
 
 import com.concerthub.domain.user.entity.User;
+import com.concerthub.domain.user.entity.enums.UserRole;
 import lombok.Builder;
 import lombok.Getter;
 
@@ -14,6 +15,7 @@ public class UserResponse {
     private String name;
     private String email;
     private String phoneNumber;
+    private UserRole role;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 
@@ -23,6 +25,7 @@ public class UserResponse {
                 .name(user.getName())
                 .email(user.getEmail())
                 .phoneNumber(user.getPhoneNumber())
+                .role(user.getRole())
                 .createdAt(user.getCreatedAt())
                 .updatedAt(user.getUpdatedAt())
                 .build();

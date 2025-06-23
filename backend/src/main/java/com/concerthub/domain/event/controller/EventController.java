@@ -9,6 +9,7 @@ import com.concerthub.global.response.ApiResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -23,6 +24,7 @@ public class EventController {
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
+    @PreAuthorize("hasRole('ADMIN')")
     public ApiResponse<EventResponse> createEvent(@Valid @RequestBody EventCreateRequest request) {
         Event event = eventService.createEvent(
                 request.getTitle(),
@@ -73,6 +75,7 @@ public class EventController {
     }
 
     @PutMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
     public ApiResponse<EventResponse> updateEvent(
             @PathVariable Long id,
             @Valid @RequestBody EventUpdateRequest request) {
@@ -91,6 +94,7 @@ public class EventController {
 
     @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
+    @PreAuthorize("hasRole('ADMIN')")
     public ApiResponse<Void> deleteEvent(@PathVariable Long id) {
         eventService.deleteEvent(id);
         return ApiResponse.success(null, "이벤트가 성공적으로 삭제되었습니다.");
