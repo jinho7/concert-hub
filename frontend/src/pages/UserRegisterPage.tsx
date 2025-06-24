@@ -1,13 +1,16 @@
 import { useState } from 'react';
-import { api } from '../api';
-import type { ApiResponse } from '../api';
+import { Link, useNavigate } from 'react-router-dom';
+import apiClient from '../api/client';
+import type { ApiResponse } from '../types/auth';
 import type { User } from '../types';
 
 const UserRegisterPage = () => {
+  const navigate = useNavigate();
   const [formData, setFormData] = useState({
     name: '',
     email: '',
-    phoneNumber: ''
+    phoneNumber: '',
+    password: 'password123' // 기본 비밀번호 (실제로는 사용자가 입력해야 함)
   });
   const [loading, setLoading] = useState(false);
   const [user, setUser] = useState<User | null>(null);
@@ -17,12 +20,14 @@ const UserRegisterPage = () => {
     setLoading(true);
 
     try {
-      const response = await api.post<ApiResponse<User>>('/users', formData);
+      const response = await apiClient.post<ApiResponse<User>>('/users/register', formData);
       setUser(response.data.data);
-      alert('회원가입이 완료되었습니다!');
+      alert('회원가입이 완료되었습니다! 로그인 페이지로 이동합니다.');
       
-      // 로컬 스토리지에 사용자 정보 저장 (간단한 로그인 대용)
-      localStorage.setItem('currentUser', JSON.stringify(response.data.data));
+      // 로그인 페이지로 이동
+      setTimeout(() => {
+        navigate('/login');
+      }, 2000);
     } catch (error) {
       console.error('회원가입 실패:', error);
       alert('회원가입에 실패했습니다.');
@@ -42,12 +47,9 @@ const UserRegisterPage = () => {
             <p><strong>이메일:</strong> {user.email}</p>
             <p><strong>전화번호:</strong> {user.phoneNumber}</p>
           </div>
-          <button
-            onClick={() => window.location.href = '/'}
-            className="mt-6 w-full bg-blue-600 text-white py-2 rounded hover:bg-blue-700"
-          >
-            이벤트 보러가기
-          </button>
+          <p className="text-sm text-gray-600 mt-4">
+            잠시 후 로그인 페이지로 이동합니다...
+          </p>
         </div>
       </div>
     );
@@ -102,6 +104,11 @@ const UserRegisterPage = () => {
             />
           </div>
 
+          <div className="text-sm text-gray-600 bg-blue-50 p-3 rounded">
+            <p><strong>알림:</strong> 현재 기본 비밀번호는 'password123'으로 설정됩니다.</p>
+            <p>회원가입 후 해당 비밀번호로 로그인해주세요.</p>
+          </div>
+
           <button
             type="submit"
             disabled={loading}
@@ -110,6 +117,13 @@ const UserRegisterPage = () => {
             {loading ? '가입 중...' : '가입하기'}
           </button>
         </form>
+
+        <p className="mt-4 text-center text-sm text-gray-600">
+          이미 계정이 있으신가요?{' '}
+          <Link to="/login" className="font-medium text-blue-600 hover:text-blue-500">
+            로그인
+          </Link>
+        </p>
       </div>
     </div>
   );

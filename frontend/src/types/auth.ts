@@ -1,0 +1,26 @@
+export interface LoginRequest {
+  email: string;
+  password: string;
+}
+
+// 백엔드 JwtDto와 일치하도록 수정
+export interface JwtTokens {
+  accessToken: string;
+  refreshToken: string;
+}
+
+export interface ApiResponse<T> {
+  success: boolean;
+  message: string;
+  data: T;
+}
+
+export interface User {
+  id: number;
+  name: string;
+  email: string;
+  phoneNumber: string;
+  role: 'USER' | 'ADMIN';
+  createdAt: string;
+  updatedAt: string;
+}

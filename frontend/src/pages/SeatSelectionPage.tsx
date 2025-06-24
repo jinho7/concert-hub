@@ -1,18 +1,19 @@
 import { useState, useEffect } from 'react';
-import { useParams } from 'react-router-dom';
-import { api } from '../api';
-import type { ApiResponse } from '../api';
+import { useParams, useNavigate } from 'react-router-dom';
+import { useAuth } from '../contexts/AuthContext';
+import apiClient from '../api/client';
+import type { ApiResponse } from '../types/auth';
 import type { Event, Seat, Reservation } from '../types';
-
 
 const SeatSelectionPage = () => {
   const { id } = useParams<{ id: string }>();
+  const navigate = useNavigate();
+  const { isAuthenticated } = useAuth();
   const [event, setEvent] = useState<Event | null>(null);
   const [seats, setSeats] = useState<Seat[]>([]);
   const [selectedSeat, setSelectedSeat] = useState<Seat | null>(null);
   const [loading, setLoading] = useState(true);
   const [reserving, setReserving] = useState(false);
-
 
   useEffect(() => {
     if (id) {
@@ -24,8 +25,8 @@ const SeatSelectionPage = () => {
     try {
       setLoading(true);
       const [eventResponse, seatsResponse] = await Promise.all([
-        api.get<ApiResponse<Event>>(`/events/${eventId}`),
-        api.get<ApiResponse<Seat[]>>(`/events/${eventId}/seats`)
+        apiClient.get<ApiResponse<Event>>(`/events/${eventId}`),
+        apiClient.get<ApiResponse<Seat[]>>(`/events/${eventId}/seats`)
       ]);
       
       setEvent(eventResponse.data.data);
@@ -58,6 +59,45 @@ const SeatSelectionPage = () => {
     }
   };
 
+  const handleReservation = async () => {
+    if (!selectedSeat) return;
+
+    // 인증 확인
+    if (!isAuthenticated) {
+      alert('예약하려면 먼저 로그인해주세요!');
+      navigate('/login');
+      return;
+    }
+
+    setReserving(true);
+
+    try {
+      const reservationData = {
+        eventId: parseInt(id!),
+        seatId: selectedSeat.id,
+        userId: 1 // TODO: 실제 사용자 ID로 변경 필요
+      };
+
+      const response = await apiClient.post<ApiResponse<Reservation>>('/reservations', reservationData);
+      const reservation = response.data.data;
+      
+      alert(`예약이 생성되었습니다! 15분 이내에 결제를 완료해주세요.`);
+      
+      // 예약 페이지로 이동
+      navigate(`/reservations/${reservation.id}`);
+      
+    } catch (error: any) {
+      console.error('예약 실패:', error);
+      const errorMessage = error.response?.data?.message || '예약에 실패했습니다.';
+      alert(errorMessage);
+      
+      // 실패 시 좌석 정보 새로고침
+      fetchEventAndSeats(id!);
+    } finally {
+      setReserving(false);
+    }
+  };
+
   if (loading) {
     return <div className="flex justify-center py-12">
       <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
@@ -76,47 +116,6 @@ const SeatSelectionPage = () => {
     acc[seat.seatRow].push(seat);
     return acc;
   }, {} as Record<string, Seat[]>);
-
-  const handleReservation = async () => {
-  if (!selectedSeat) return;
-
-  // 로그인 사용자 확인
-  const currentUser = localStorage.getItem('currentUser');
-  if (!currentUser) {
-    alert('예약하려면 먼저 회원가입을 해주세요!');
-    window.location.href = '/register';
-    return;
-  }
-
-  const user = JSON.parse(currentUser);
-  setReserving(true);
-
-  try {
-    const reservationData = {
-      eventId: parseInt(id!),
-      seatId: selectedSeat.id,
-      userId: user.id
-    };
-
-    const response = await api.post<ApiResponse<Reservation>>('/reservations', reservationData);
-    const reservation = response.data.data;
-    
-    alert(`예약이 생성되었습니다! 15분 이내에 결제를 완료해주세요.`);
-    
-    // 예약 페이지로 이동
-    window.location.href = `/reservations/${reservation.id}`;
-    
-  } catch (error: any) {
-    console.error('예약 실패:', error);
-    const errorMessage = error.response?.data?.message || '예약에 실패했습니다.';
-    alert(errorMessage);
-    
-    // 실패 시 좌석 정보 새로고침
-    fetchEventAndSeats(id!);
-  } finally {
-    setReserving(false);
-  }
-};
 
   return (
     <div className="max-w-4xl mx-auto">
