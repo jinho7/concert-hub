@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
-import { api } from '../api';
-import type { ApiResponse } from '../api';
+import { Link } from 'react-router-dom';
+import apiClient from '../api/client';
+import type { ApiResponse } from '../types/auth';
 import type { Event } from '../types';
 
 const EventListPage = () => {
@@ -15,7 +16,7 @@ const EventListPage = () => {
   const fetchEvents = async () => {
     try {
       setLoading(true);
-      const response = await api.get<ApiResponse<Event[]>>('/events');
+      const response = await apiClient.get<ApiResponse<Event[]>>('/events');
       setEvents(response.data.data);
     } catch (err) {
       setError('이벤트를 불러오는데 실패했습니다.');
@@ -100,17 +101,16 @@ const EventListPage = () => {
                 </div>
               </div>
               
-              <button
-                onClick={() => window.location.href = `/events/${event.id}/seats`}
-                disabled={event.status !== 'OPEN'}
-                className={`w-full py-2 px-4 rounded font-medium transition-colors ${
+              <Link
+                to={`/events/${event.id}/seats`}
+                className={`block w-full py-2 px-4 rounded font-medium transition-colors text-center ${
                   event.status === 'OPEN'
                     ? 'bg-blue-600 text-white hover:bg-blue-700'
-                    : 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                    : 'bg-gray-300 text-gray-500 cursor-not-allowed pointer-events-none'
                 }`}
               >
                 {event.status === 'OPEN' ? '좌석 선택' : '예매 불가'}
-              </button>
+              </Link>
             </div>
           ))}
         </div>
