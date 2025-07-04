@@ -21,7 +21,7 @@ public class UserCreateRequest {
     private String email;
 
     @NotBlank(message = "전화번호는 필수입니다.")
-    @Pattern(regexp = "^\\d{3}-\\d{4}-\\d{4}$", message = "전화번호는 000-0000-0000 형식이어야 합니다.")
+    @Pattern(regexp = "^\\d{10,11}$", message = "전화번호는 10-11자리 숫자여야 합니다.")
     private String phoneNumber;
 
     @NotBlank(message = "비밀번호는 필수입니다.")
