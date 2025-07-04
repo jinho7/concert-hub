@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
-import authService from '../services/authService';
+import { useAuth } from '../contexts/AuthContext';
 import type { LoginRequest } from '../types';
 
 const LoginPage: React.FC = () => {
@@ -12,6 +12,7 @@ const LoginPage: React.FC = () => {
   const [error, setError] = useState<string>('');
   
   const navigate = useNavigate();
+  const { login } = useAuth();
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -29,8 +30,8 @@ const LoginPage: React.FC = () => {
     setError('');
 
     try {
-      await authService.login(formData);
-  // 로그인 성공 시 이벤트 페이지로 이동
+      await login(formData.email, formData.password);
+      // 로그인 성공 시 이벤트 페이지로 이동
       navigate('/events');
     } catch (err) {
       setError(err instanceof Error ? err.message : '로그인에 실패했습니다.');

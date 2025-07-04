@@ -1,7 +1,14 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
+import { useAuth } from '../contexts/AuthContext';
 
 const LandingPage: React.FC = () => {
+  const { isAuthenticated, logout } = useAuth();
+
+  const handleLogout = async () => {
+    await logout();
+  };
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-purple-50">
       {/* 네비게이션 */}
@@ -12,18 +19,29 @@ const LandingPage: React.FC = () => {
               <h1 className="text-2xl font-bold text-gray-900">🎫 Concert Hub</h1>
             </div>
             <div className="flex space-x-4">
-              <Link
-                to="/login"
-                className="bg-gray-100 hover:bg-gray-200 text-gray-700 px-3 py-2 rounded-md text-sm font-medium"
-              >
-                로그인
-              </Link>
-              <Link
-                to="/register"
-                className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md text-sm font-medium"
-              >
-                회원가입
-              </Link>
+              {isAuthenticated ? (
+                <button
+                  onClick={handleLogout}
+                  className="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-md text-sm font-medium"
+                >
+                  로그아웃
+                </button>
+              ) : (
+                <>
+                  <Link
+                    to="/login"
+                    className="bg-gray-100 hover:bg-gray-200 text-gray-700 px-3 py-2 rounded-md text-sm font-medium"
+                  >
+                    로그인
+                  </Link>
+                  <Link
+                    to="/register"
+                    className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md text-sm font-medium"
+                  >
+                    회원가입
+                  </Link>
+                </>
+              )}
             </div>
           </div>
         </div>
@@ -43,12 +61,21 @@ const LandingPage: React.FC = () => {
           </p>
 
           <div className="flex justify-center mb-16">
-            <Link
-              to="/login"
-              className="bg-blue-600 hover:bg-blue-700 text-white px-8 py-4 rounded-lg text-lg font-semibold shadow-lg transform hover:scale-105 transition-all"
-            >
-              지금 시작하기
-            </Link>
+            {isAuthenticated ? (
+              <Link
+                to="/events"
+                className="bg-blue-600 hover:bg-blue-700 text-white px-8 py-4 rounded-lg text-lg font-semibold shadow-lg transform hover:scale-105 transition-all"
+              >
+                이벤트 둘러보기
+              </Link>
+            ) : (
+              <Link
+                to="/login"
+                className="bg-blue-600 hover:bg-blue-700 text-white px-8 py-4 rounded-lg text-lg font-semibold shadow-lg transform hover:scale-105 transition-all"
+              >
+                지금 시작하기
+              </Link>
+            )}
           </div>
 
           {/* 특징 소개 */}
