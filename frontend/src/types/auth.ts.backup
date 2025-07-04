@@ -9,12 +9,6 @@ export interface JwtTokens {
   refreshToken: string;
 }
 
-export interface ApiResponse<T> {
-  success: boolean;
-  message: string;
-  data: T;
-}
-
 export interface User {
   id: number;
   name: string;
