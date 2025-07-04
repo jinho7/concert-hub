@@ -1,3 +1,21 @@
+// 공통 API 응답 타입
+export interface ApiResponse<T> {
+  success: boolean;
+  message: string;
+  data: T;
+}
+
+// 인증 관련 타입
+export interface LoginRequest {
+  email: string;
+  password: string;
+}
+
+export interface JwtTokens {
+  accessToken: string;
+  refreshToken: string;
+}
+
 // 이벤트 관련 타입
 export interface Event {
   id: number;
@@ -32,6 +50,9 @@ export interface User {
   name: string;
   email: string;
   phoneNumber: string;
+  role?: 'USER' | 'ADMIN';
+  createdAt?: string;
+  updatedAt?: string;
 }
 
 // 예약 관련 타입

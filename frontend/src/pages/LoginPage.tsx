@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import authService from '../services/authService';
-import { LoginRequest } from '../types/auth';
+import type { LoginRequest } from '../types';
 
 const LoginPage: React.FC = () => {
   const [formData, setFormData] = useState<LoginRequest>({
@@ -30,8 +30,8 @@ const LoginPage: React.FC = () => {
 
     try {
       await authService.login(formData);
-      // 로그인 성공 시 홈페이지로 이동
-      navigate('/');
+  // 로그인 성공 시 이벤트 페이지로 이동
+      navigate('/events');
     } catch (err) {
       setError(err instanceof Error ? err.message : '로그인에 실패했습니다.');
     } finally {
@@ -91,14 +91,12 @@ const LoginPage: React.FC = () => {
 
           {error && (
             <div className="rounded-md bg-red-50 p-4">
-              <div className="flex">
-                <div className="ml-3">
-                  <h3 className="text-sm font-medium text-red-800">
-                    로그인 오류
-                  </h3>
-                  <div className="mt-2 text-sm text-red-700">
-                    {error}
-                  </div>
+              <div className="text-center">
+                <h3 className="text-sm font-medium text-red-800">
+                  로그인 오류
+                </h3>
+                <div className="mt-2 text-sm text-red-700">
+                  {error}
                 </div>
               </div>
             </div>
@@ -122,12 +120,6 @@ const LoginPage: React.FC = () => {
                 '로그인'
               )}
             </button>
-          </div>
-
-          <div className="text-center">
-            <p className="text-sm text-gray-600">
-              테스트 계정: admin@test.com / password123
-            </p>
           </div>
         </form>
       </div>

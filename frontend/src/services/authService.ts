@@ -1,4 +1,4 @@
-import { LoginRequest, JwtTokens, ApiResponse } from '../types/auth';
+import type { LoginRequest, JwtTokens, ApiResponse } from '../types';
 
 const TOKEN_KEY = 'concert_hub_tokens';
 const API_BASE_URL = 'http://localhost:8080/api';

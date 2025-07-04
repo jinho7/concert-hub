@@ -1,4 +1,5 @@
-import axios, { AxiosError, AxiosResponse } from 'axios';
+import axios from 'axios';
+import type { AxiosError, AxiosResponse, InternalAxiosRequestConfig } from 'axios';
 import authService from '../services/authService';
 
 const API_BASE_URL = 'http://localhost:8080/api';
@@ -62,7 +63,7 @@ apiClient.interceptors.response.use(
 
 // TypeScript를 위한 _retry 속성 확장
 declare module 'axios' {
-  interface AxiosRequestConfig {
+  interface InternalAxiosRequestConfig {
     _retry?: boolean;
   }
 }
